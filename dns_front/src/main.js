@@ -3,6 +3,8 @@ import App from "./App.vue";
 import store from "./store";
 import vuetify from "./plugins/vuetify";
 import io from "socket.io-client";
+import axios from "axios";
+Vue.prototype.$axios = axios;
 
 //소켓 관련 설정
 const socket = io("http://localhost:8080", {
