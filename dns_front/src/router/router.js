@@ -14,9 +14,13 @@ export default new Router({
       component: HelloWorld,
     },
     {
-      path: "/direct",
-      name: "directMessage",
-      // lazy-loaded 라우팅
+      path: "/dm-rooms",
+      name: "dm-roomList",
+      component: () => import("../components/DirectMsgList.vue"),
+    },
+    {
+      path: "/dm-rooms/:dmRoomId",
+      name: "dm-room",
       component: () => import("../components/DirectMsg.vue"),
     },
   ],
