@@ -16,12 +16,12 @@ export default new Router({
     {
       path: "/dm-rooms",
       name: "dm-roomList",
-      component: () => import("../components/DirectMsgList.vue"),
+      component: () => import("../components/dmRoom/DirectMsgList.vue"),
     },
     {
       path: "/dm-rooms/:dmRoomId",
       name: "dm-room",
-      component: () => import("../components/DirectMsg.vue"),
+      component: () => import("../components/dmRoom/DirectMsg.vue"),
     },
   ],
 });
