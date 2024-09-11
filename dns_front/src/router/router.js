@@ -2,10 +2,11 @@
 import Vue from "vue";
 import Router from "vue-router";
 import HelloWorld from "../components/HelloWorld.vue";
+import VueRouter from "vue-router";
 
 Vue.use(Router);
 
-export default new Router({
+export default new VueRouter({
   mode: "history", // URL에 # 제거, 없애지 않으려면 'hash'로 설정
   routes: [
     {
@@ -22,6 +23,16 @@ export default new Router({
       path: "/dm-rooms/:dmRoomId",
       name: "dm-room",
       component: () => import("../components/dmRoom/DirectMsg.vue"),
+    },
+    {
+      path: "/posts",
+      name: "mainBoard",
+      component: () => import("../components/board/mainBoard.vue"),
+    },
+    {
+      path: "/posts/:postId/comments",
+      name: "reply",
+      component: () => import("../components/reply/reply.vue"),
     },
   ],
 });

@@ -1,8 +1,10 @@
 <template>
-  <div id="app">
+  <div>
     <Router-link to="/">Home</Router-link>
     <br />
     <Router-link to="/dm-rooms">DM</Router-link>
+    <br />
+    <Router-link to="/posts">Board</Router-link>
     <router-view></router-view>
   </div>
 </template>
