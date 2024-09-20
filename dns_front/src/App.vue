@@ -5,6 +5,8 @@
     <Router-link to="/dm-rooms">DM</Router-link>
     <br />
     <Router-link to="/posts">Board</Router-link>
+    <br/>
+    <Router-link to="/notification/1">알림</Router-link>
     <router-view></router-view>
   </div>
 </template>
