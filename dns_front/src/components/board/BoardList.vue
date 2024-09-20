@@ -1,18 +1,19 @@
 <template>
   <div>
     <h1>게시판 입니다.</h1>
-    <!-- 게시글 for문 -->
+    <!-- 게시글 for문-->
     <div v-if="isBoard == false">
       <div>
         멤버 ID : {{ post.memberId }}<br />
+        게시물 ID : {{ post.postId }}<br />
         {{ post.profile }}
-        {{ post.nickName }}
-        {{ post.createdAt }}
+        {{ post.nickname }}
+        {{ post.createdAt }}<br />
         <!-- 이미지 for문 -->
         <div v-for="(image, idx) in post.images" :key="idx">
           {{ image }}
         </div>
-        {{ post.contents }}
+        {{ post.postContent }}
       </div>
       <button @click="editBoard()">수정</button>
       <button @click="deleteBoard(post.postId)">삭제</button>
@@ -22,10 +23,10 @@
         멤버 ID : {{ post.memberId }}<br />
         {{ post.profile }}
         {{ post.nickName }}
-        {{ post.createdAt }}
+        {{ post.createdAt }}<br />
         <!-- 이미지 for문 -->
         <input type="file" multiple /><br />
-        <input type="text" v-model="editBoardText" />
+        <v-file-input full-width="200" type="text" v-model="editBoardText" />
         <div v-for="(image, idx) in post.images" :key="idx">
           {{ image }}
         </div>
@@ -34,12 +35,21 @@
       <button @click="editBoardCancel()">취소</button>
     </div>
     <div>
-      <button @click="fetchReply()">댓글 보기</button>
+      <button @click="fetchComment(post.postId)">댓글 보기</button>
       <br />
-      <div v-if="replyState == true">
+      <div v-if="isComment === true">
         <ul>
-          <li v-for="reply in comments" :key="reply.commnetId">
-            <Reply :post="post" :reply="reply" />
+          <li v-for="comment in comments" :key="comment.commentId">
+            <Comment :post="post" :comment="comment" />
+            <button @click="fetchReply(comment.commentId)">댓글 더보기</button>
+            <br />
+            <br />
+            <br />
+            <div v-if="isReply === true">
+              <ul v-for="(reply, idx) in comment.reply" :key="idx">
+                <Reply :reply="reply" />
+              </ul>
+            </div>
           </li>
         </ul>
       </div>
@@ -48,9 +58,10 @@
   </div>
 </template>
 <script>
+import Comment from "../reply/Comment";
 import Reply from "../reply/Reply";
 export default {
-  components: { Reply },
+  components: { Comment, Reply },
   props: {
     post: {
       type: Object,
@@ -59,46 +70,37 @@ export default {
   },
   data() {
     return {
-      comments: [
-        {
-          postId: 1,
-          profile: "프로필 이미지",
-          nickName: "Canelo",
-          comment: "좋아요!",
-          commnetId: 1,
-        },
-      ],
-      replyState: false,
+      comments: [],
+      isComment: false,
       isBoard: false,
+      isReply: false,
       editBoardText: "",
       editBoardImages: [],
     };
   },
-  created() {
-    // this.fetchBoard();
-  },
   methods: {
     //댓글 목록 조회
-    fetchReply() {
-      this.replyState = !this.replyState;
-      // return (
-      //   this.$axios
-      //     // .get(`http://172.16.101.131:8080//post/${this.post.postId}/comments`)
-      //     .get(`/post/${this.post.postId}/comments`)
-      //     .then((res) => {
-      //       console.log("통신 성공!");
-      //       console.log("통신 결과값 :" + res);
-      //       this.commnets.push(res.data);
-      //     })
-      //     .catch((err) => {
-      //       console.log(err);
-      //     })
-      // );
+    fetchComment(postId) {
+      this.isComment = !this.isComment;
+      console.log(this.post.content);
+      return (
+        this.$axios
+          // .get(`http://172.16.101.131:8080//post/${this.post.postId}/comments`)
+          .get(`/posts/${postId}/comments`)
+          .then((res) => {
+            console.log("통신 성공!");
+            console.log(res);
+            this.comments = res.data.content;
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+      );
     },
     //게시물 수정 상태 true <> false
     editBoard() {
       this.isBoard = !this.isBoard;
-      this.editBoardText = this.post.contents;
+      this.editBoardText = this.post.postContent;
       this.editBoardImages.push(this.post.images);
     },
     editBoardCancel() {
@@ -112,7 +114,7 @@ export default {
         text: this.editBoardText,
         images: this.editBoardImages,
       };
-      this.$axios.patch(`/post/${this.post.postId}`, editBoard).then((res) => {
+      this.$axios.patch(`/posts/${this.post.postId}`, editBoard).then((res) => {
         if (res.state == 202) {
           alert("수정이 완료되었습니다.");
           this.isBoard = false;
@@ -122,6 +124,19 @@ export default {
         }
       });
     },
+    //대댓글 상태
+    fetchReply(commentId) {
+      this.$axios
+        .get(`/posts/${this.post.postId}/comments/${commentId}`)
+        .then((res) => {
+          const index = this.comments.findIndex((comment) => {
+            return comment.commentId === commentId;
+          });
+          this.comments[index].reply = res.data.content;
+          this.isReply = !this.isReply;
+        });
+    },
+
     //게시물 삭제
     deleteBoard(postId) {
       //로그인한 멤버id랑 비교하는거로 수정해야함
