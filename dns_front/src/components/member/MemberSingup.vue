@@ -18,6 +18,10 @@
                 <label for="profileImageUrl">Profile Image URL:</label>
                 <input v-model="profileImageUrl" type="text" id="profileImageUrl" placeholder="Profile Image URL" />
             </div>
+            <div>
+                <label for="socialType">social type:</label>
+                <input v-model="socialType" type="text" id="socialType" placeholder="socialType" />
+            </div>
             <button type="submit">Submit</button>
         </form>
     </div>
@@ -32,18 +36,21 @@ export default {
             email: '',
             password: '',
             nickname: '',
-            profileImageUrl: ''
+            profileImageUrl: '',
+            socialType: ''
         };
     },
     methods: {
         async singUp() {
             try {
-                const response = await axios.post('/api/members/singup', {
+                const response = await axios.post('/api/members/signup', {
                     email: this.email,
                     password: this.password,
                     nickname: this.nickname,
-                    profileImageUrl: this.profileImageUrl
+                    profileImageUrl: this.profileImageUrl,
+                    socialType: this.socialType
                 });
+                console.log("signup")
                 alert(response.data);
             } catch (error) {
                 alert(error.response.data);

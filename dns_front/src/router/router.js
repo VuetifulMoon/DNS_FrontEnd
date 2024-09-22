@@ -27,17 +27,22 @@ export default new VueRouter({
     {
       path: "/posts",
       name: "mainBoard",
-      component: () => import("../components/board/MainBoard.vue"),
+      component: () => import("../components/board/mainBoard.vue"),
     },
     {
       path: "/posts/:postId/comments",
       name: "reply",
-      component: () => import("../components/reply/Reply.vue"),
+      component: () => import("../components/reply/reply.vue"),
     },
     {
       path: "/notification/:memberId",
       name: "notification",
       component: () => import("../views/Notice.vue"),
     },
+    {
+      path: "/memberSignup/",
+      name: "memberSignup",
+      component: () => import("../components/member/MemberSingup.vue")
+    }
   ],
 });
