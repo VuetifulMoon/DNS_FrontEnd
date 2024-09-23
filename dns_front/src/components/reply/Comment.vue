@@ -7,7 +7,7 @@
         {{ comment.memberProfileImage }}
         {{ comment.memberProfile.nickname }}<br />
         {{ comment.commentContent }}
-        <button @click="editComment(comment.commentId)">수정</button>
+        <button @click="editComment()">수정</button>
         <button @click="deleteComment(post.postId, comment.commentId)">
           삭제
         </button>
@@ -19,7 +19,9 @@
         {{ comment.memberProfileImage }}
         {{ comment.memberNickName }}<br />
         <input type="text" v-model="editCommentText" />
-        <button @click="EDIT_Comment()">수정완료</button>
+        <button @click="EDIT_Comment(post.postId, comment.commentId)">
+          수정완료
+        </button>
         <button @click="editComment()">취소</button>
       </div>
     </ul>
@@ -74,28 +76,28 @@ export default {
       this.editCommentText = "";
     },
     //댓글 수정
-    EDIT_Comment() {
-      // this.$axios
-      //   .patch(
-      //     `/post/${this.post.postId}/comments/${this.comment.commentId}`,
-      //     this.editCommentText
-      //   )
-      //   .then((res) => {
-      //     if (res.state == 202) {
-      alert("수정이 완료되었습니다.");
-      this.isComment = false;
-      //   } else {
-      //     alert("실패했습니다. 다시 시도해주세요.");
-      //     this.isComment = false;
-      //   }
-      // });
+    EDIT_Comment(postId, commentId) {
+      this.$axios
+        .patch(`/posts/${postId}/comments/${commentId}`, this.editCommentText)
+        .then((res) => {
+          if (res.state == 202) {
+            alert("수정이 완료되었습니다.");
+            this.isComment = false;
+          } else {
+            alert("실패했습니다. 다시 시도해주세요.");
+            this.isComment = false;
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     },
     //댓글 삭제
     deleteComment(postId, commentId) {
       //로그인한 멤버id랑 비교하는거로 수정해야함
       if (this.comments.memberId == 1) {
         this.$axios
-          .delete(`/post/${postId}/comments/${commentId}`)
+          .delete(`/posts/${postId}/comments/${commentId}`)
           .then((res) => {
             if (res.status == 204) {
               alert("삭제가 완료되었습니다.");
