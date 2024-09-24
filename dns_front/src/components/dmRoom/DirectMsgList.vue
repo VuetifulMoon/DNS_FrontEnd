@@ -5,9 +5,14 @@
     <ul>
       <li v-for="list in roomList" :key="list.dmRoomId">
         <Router-link :to="`/dm-rooms/${list.dmRoomId}`">
-          {{ list.profile }}
-          {{ list.nickName }}
-          {{ list.dmMessage }}
+          멤버아이디 : {{ list.memberId }}
+          <br />
+          닉네임 : {{ list.nickname }}
+          <br />
+          최근 메세지 : {{ list.recentMessage }}
+          <br />
+          최근 메세지 시간 : {{ list.recentMessageTime }}
+          <br />
         </Router-link>
       </li>
     </ul>
