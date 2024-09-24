@@ -59,7 +59,7 @@
 </template>
 <script>
 import Comment from "../reply/Comment";
-import Reply from "../reply/reply";
+import Reply from "../reply/Reply";
 export default {
   components: { Comment, Reply },
   props: {
