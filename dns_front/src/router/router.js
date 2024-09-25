@@ -23,6 +23,7 @@ export default new VueRouter({
       path: "/dm-rooms/:dmRoomId",
       name: "dm-room",
       component: () => import("../components/dmRoom/DirectMsg.vue"),
+      props: true,
     },
     {
       path: "/posts",

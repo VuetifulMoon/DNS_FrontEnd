@@ -6,21 +6,26 @@
       <li v-for="list in roomList" :key="list.dmRoomId">
         <Router-link :to="`/dm-rooms/${list.dmRoomId}`">
           멤버아이디 : {{ list.memberId }}
-          <br />
-          닉네임 : {{ list.nickname }}
-          <br />
-          최근 메세지 : {{ list.recentMessage }}
-          <br />
-          최근 메세지 시간 : {{ list.recentMessageTime }}
-          <br />
         </Router-link>
+
+        <br />
+        닉네임 : {{ list.nickname }}
+        <br />
+        최근 메세지 : {{ list.recentMessage }}
+        <br />
+        최근 메세지 시간 : {{ list.recentMessageTime }}
+        <br />
       </li>
     </ul>
-    <router-view></router-view>
+    <router-view v-if="roomList.length > 0" :roomList="roomList" />
+    <DirectMsg v-if="roomList.length > 0" :roomList="roomList" />
   </div>
 </template>
 <script>
+import DirectMsg from "./DirectMsg";
+
 export default {
+  components: { DirectMsg },
   data() {
     return {
       memberId: 1,
@@ -40,6 +45,7 @@ export default {
         .then((res) => {
           console.log(res.data);
           this.roomList = res.data;
+          console.log(this.roomList);
         })
         .catch((err) => {
           console.error("에러 발생:" + err);

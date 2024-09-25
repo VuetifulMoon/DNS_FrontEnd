@@ -5,7 +5,7 @@
     <input v-model="userId" type="text" />
     내용: <input v-model="dmMessage" type="text" @keyup="sendMessage" />
     <div v-for="(item, idx) in dmMessages" :key="idx">
-      <h3>유저이름: {{ item.nickName }}</h3>
+      <h3>유저이름: {{ item.nickname }}</h3>
       <h3>내용: {{ item.dmMessage }}</h3>
       <br />
     </div>
@@ -21,39 +21,20 @@ export default {
     return {
       dmRoomId: this.$route.params.dmRoomId,
       userId: "",
+      memberId: 1,
       dmMessage: "",
-      dmMessages: [
-        {
-          userId: "정용안",
-          nickName: "에너지drink",
-          dmMessage: "HelloWorld",
-        },
-        {
-          userId: "조원진",
-          nickName: "canelo2",
-          dmMessage: "HelloWorld",
-        },
-        {
-          userId: "정용안",
-          nickName: "에너지drink",
-          dmMessage: "HelloWorld",
-        },
-        {
-          userId: "조원진",
-          nickName: "canelo2",
-          dmMessage: "HelloWorld",
-        },
-        {
-          userId: "정용안",
-          nickName: "에너지drink",
-          dmMessage: "HelloWorld",
-        },
-      ],
+      dmMessages: [],
     };
+  },
+  props: {
+    roomList: {
+      type: Array,
+      required: true,
+    },
   },
   created() {
     this.connect();
-    // this.dmRoom();
+    this.dmRoom();
   },
   methods: {
     sendMessage(e) {
@@ -88,12 +69,12 @@ export default {
           this.connected = true;
           console.log("소켓 연결 성공", frame);
           // 구독 ,,
-          // this.stompClient.subscribe(`/sub/dm/${dmRoomId}`, (res) => {
-          //   console.log("구독 성공 결과 : ", res.body);
+          this.stompClient.subscribe(`/sub/dm/${dmRoomId}`, (res) => {
+            console.log("구독 성공 결과 : ", res.body);
 
-          //   // JSON을 객체로 변환 후 배열에 넣어주기
-          //   this.recvList.push(JSON.parse(res.body));
-          // });
+            // JSON을 객체로 변환 후 배열에 넣어주기
+            this.recvList.push(JSON.parse(res.body));
+          });
         },
         (error) => {
           // 소켓 연결 실패
@@ -103,9 +84,17 @@ export default {
       );
     },
     dmRoom() {
-      // let dmRoomId = this.$route.params.dmRoomId;
+      console.log(this.roomList);
+      const data = {
+        dmRoomId: this.dmRoomId,
+        memberProfile: {
+          memberId: this.memberId,
+          profileImageUrl: this.roomList.memberProfile.profileImageUrl,
+          nickname: this.roomList.memberProfile.nickname,
+        },
+      };
       this.$axios
-        .get(`http://localhost:8080/dm-rooms/${this.dmRoomId}`)
+        .get(`/dm-rooms/${this.dmRoomId}`)
         .then((res) => {
           this.recvList = res.data;
         })
