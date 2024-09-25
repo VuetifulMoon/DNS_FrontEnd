@@ -15,10 +15,10 @@
         <br />
         최근 메세지 시간 : {{ list.recentMessageTime }}
         <br />
+        <router-view v-if="list !== undefined" :list="list" />
+        <DirectMsg v-if="list !== undefined" :list="list" />
       </li>
     </ul>
-    <router-view v-if="roomList.length > 0" :roomList="roomList" />
-    <DirectMsg v-if="roomList.length > 0" :roomList="roomList" />
   </div>
 </template>
 <script>

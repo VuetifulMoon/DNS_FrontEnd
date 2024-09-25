@@ -27,14 +27,15 @@ export default {
     };
   },
   props: {
-    roomList: {
-      type: Array,
+    list: {
+      type: Object,
       required: true,
     },
   },
   created() {
     this.connect();
     this.dmRoom();
+    console.log(this.list.dmRoomId);
   },
   methods: {
     sendMessage(e) {
@@ -69,7 +70,7 @@ export default {
           this.connected = true;
           console.log("소켓 연결 성공", frame);
           // 구독 ,,
-          this.stompClient.subscribe(`/sub/dm/${dmRoomId}`, (res) => {
+          this.stompClient.subscribe(`/sub/dm/${this.dmRoomId}`, (res) => {
             console.log("구독 성공 결과 : ", res.body);
 
             // JSON을 객체로 변환 후 배열에 넣어주기
@@ -84,17 +85,17 @@ export default {
       );
     },
     dmRoom() {
-      console.log(this.roomList);
+      console.log(this.list.dmRoomId);
       const data = {
         dmRoomId: this.dmRoomId,
         memberProfile: {
           memberId: this.memberId,
-          profileImageUrl: this.roomList.memberProfile.profileImageUrl,
-          nickname: this.roomList.memberProfile.nickname,
+          profileImageUrl: this.list.memberProfile.profileImageUrl,
+          nickname: this.list.memberProfile.nickname,
         },
       };
       this.$axios
-        .get(`/dm-rooms/${this.dmRoomId}`)
+        .get(`/dm-rooms/${this.dmRoomId}`, data)
         .then((res) => {
           this.recvList = res.data;
         })
