@@ -24,10 +24,9 @@
 </template>
 
 <script>
-import DirectMsg from "./DirectMsg.vue";
 import DirectMsgList from "./DirectMsgList.vue";
 export default {
-  components: { DirectMsgList, DirectMsg },
+  components: { DirectMsgList },
   data() {
     return {
       isDirect: false,
