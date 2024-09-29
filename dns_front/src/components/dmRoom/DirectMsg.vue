@@ -1,8 +1,6 @@
 <template>
-  <div>
-    {{ dmRoomId }}번 채팅방<br />
-    유저이름:
-    <input v-model="userId" type="text" />
+  <div v-if="list">
+    {{ list.dmRoomId }}번 채팅방<br />
     내용: <input v-model="dmMessage" type="text" @keyup="sendMessage" />
     <div v-for="(item, idx) in dmMessages" :key="idx">
       <h3>유저이름: {{ item.nickname }}</h3>
@@ -11,41 +9,45 @@
     </div>
   </div>
 </template>
+
 <script>
 import Stomp from "webstomp-client";
 import SockJS from "sockjs-client";
 
 export default {
-  name: "App",
-  data() {
-    return {
-      dmRoomId: this.$route.params.dmRoomId,
-      userId: "",
-      memberId: 1,
-      dmMessage: "",
-      dmMessages: [],
-    };
-  },
+  name: "DirectMsg",
   props: {
     list: {
       type: Object,
       required: true,
     },
   },
+  data() {
+    return {
+      memberId: 1,
+      dmMessage: "",
+      dmMessages: [],
+      stompClient: null, // Stomp 클라이언트 초기화
+    };
+  },
   created() {
+    // WebSocket 연결 및 메시지 구독
     this.connect();
+    // DM 방 정보 가져오기
     this.dmRoom();
+    // 콘솔에서 받아온 dmRoomId 확인
     console.log(this.list.dmRoomId);
   },
   methods: {
     sendMessage(e) {
-      //enter 및 데이터가 존재하는 경우에만 send함수 실행
-      if (e.keyCode === 13 && this.userId !== "" && this.dmMessage !== "") {
+      // Enter 키와 입력값이 있을 때 메시지 전송
+      if (e.keyCode === 13 && this.dmMessage !== "") {
         this.send();
         this.dmMessage = "";
       }
     },
     send() {
+      // WebSocket을 통한 메시지 전송
       console.log("Send message:" + this.dmMessage);
       if (this.stompClient && this.stompClient.connected) {
         const dm = {
@@ -56,48 +58,45 @@ export default {
       }
     },
     connect() {
+      // WebSocket 서버 연결
       const serverURL = "http://localhost:8080";
       let socket = new SockJS(serverURL);
-      //socket위에 stomp를 올림
       this.stompClient = Stomp.over(socket);
+
       console.log(`소켓 연결시도 : ${serverURL}`);
       this.stompClient.connect(
-        //헤더 정보
         {},
-        //연결 성공 시 호출되는 콜백 함수
         (frame) => {
           // 소켓 연결 성공
-          this.connected = true;
           console.log("소켓 연결 성공", frame);
-          // 구독 ,,
-          this.stompClient.subscribe(`/sub/dm/${this.dmRoomId}`, (res) => {
+          this.stompClient.subscribe(`/sub/dm/${this.list.dmRoomId}`, (res) => {
             console.log("구독 성공 결과 : ", res.body);
-
-            // JSON을 객체로 변환 후 배열에 넣어주기
-            this.recvList.push(JSON.parse(res.body));
+            // 메시지 배열에 추가
+            this.dmMessages.push(JSON.parse(res.body));
           });
         },
         (error) => {
           // 소켓 연결 실패
           console.log("소켓 연결 실패", error);
-          this.connected = false;
         }
       );
     },
     dmRoom() {
-      console.log(this.list.dmRoomId);
+      // 채팅방 정보 가져오기
       const data = {
-        dmRoomId: this.dmRoomId,
+        dmRoomId: this.list.dmRoomId,
         memberProfile: {
-          memberId: this.memberId,
-          profileImageUrl: this.list.memberProfile.profileImageUrl,
-          nickname: this.list.memberProfile.nickname,
+          memberId: this.list.memberId,
+          profileImageUrl: this.list.profileImageUrl,
+          nickname: this.list.nickname,
         },
       };
+      console.log(data);
+
       this.$axios
-        .get(`/dm-rooms/${this.dmRoomId}`, data)
+        .get(`/dm-rooms/${this.list.dmRoomId}`, data)
         .then((res) => {
-          this.recvList = res.data;
+          this.dmMessages = res.data;
         })
         .catch((err) => {
           console.log("에러 발생 => " + err);

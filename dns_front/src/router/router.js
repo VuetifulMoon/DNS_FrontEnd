@@ -23,7 +23,7 @@ export default new VueRouter({
       path: "/dm-rooms/:dmRoomId",
       name: "dm-room",
       component: () => import("../components/dmRoom/DirectMsg.vue"),
-      props: true,
+      props: (route) => ({ list: route.params.list }),
     },
     {
       path: "/posts",
@@ -39,6 +39,11 @@ export default new VueRouter({
       path: "/notification/:memberId",
       name: "notification",
       component: () => import("../views/Notice.vue"),
+    },
+    {
+      path: "/dmMain",
+      name: "DirectMessageMain",
+      component: () => import("../components/dmRoom/DirectMessage.vue"),
     },
     {
       path: "/memberSignup/",
