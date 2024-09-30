@@ -48,7 +48,7 @@
         </v-list-item-content>
 
         <v-list-item-action>
-          <v-btn icon>
+          <v-btn icon @click="check(notice.notificationId)">
             <v-icon color="grey lighten-1">mdi-information</v-icon>
           </v-btn>
         </v-list-item-action>
@@ -58,8 +58,15 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
 
+  methods: {
+    check(notificationId) {
+      axios.post(`/notification/${notificationId}`);
+    }
+  }
 }
 </script>
 
