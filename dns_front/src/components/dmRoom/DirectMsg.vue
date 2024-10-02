@@ -34,23 +34,13 @@ export default {
     // WebSocket 연결 및 메시지 구독
     this.connect();
     // DM 방 정보 가져오기
-    // if (this.list) {
-    //   this.dmRoom();
-    // }
+    if (this.list) {
+      this.dmRoom();
+    }
     // 콘솔에서 받아온 dmRoomId 확인
     console.log(this.list.dmRoomId);
   },
-  watch: {
-    list: {
-      immediate: true,
-      getList(newList) {
-        if (newList) {
-          this.connect(); // list가 준비된 후 WebSocket 연결
-          this.dmRoom(); // 채팅방 정보 가져오기
-        }
-      },
-    },
-  },
+
   methods: {
     sendMessage(e) {
       // Enter 키와 입력값이 있을 때 메시지 전송
