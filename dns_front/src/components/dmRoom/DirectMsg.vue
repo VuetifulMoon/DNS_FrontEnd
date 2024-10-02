@@ -34,9 +34,22 @@ export default {
     // WebSocket 연결 및 메시지 구독
     this.connect();
     // DM 방 정보 가져오기
-    this.dmRoom();
+    if (this.list) {
+      this.dmRoom();
+    }
     // 콘솔에서 받아온 dmRoomId 확인
     console.log(this.list.dmRoomId);
+  },
+  watch: {
+    list: {
+      immediate: true,
+      getList(newList) {
+        if (newList) {
+          this.connect(); // list가 준비된 후 WebSocket 연결
+          this.dmRoom(); // 채팅방 정보 가져오기
+        }
+      },
+    },
   },
   methods: {
     sendMessage(e) {
@@ -54,12 +67,12 @@ export default {
           userId: this.userId,
           dmMessage: this.dmMessage,
         };
-        this.stompClient.send("/dm-message", JSON.stringify(dm), {});
+        this.stompClient.send("/pub/dm-message", JSON.stringify(dm), {});
       }
     },
     connect() {
       // WebSocket 서버 연결
-      const serverURL = "http://localhost:8080";
+      const serverURL = "http://localhost:8080/ws-stomp";
       let socket = new SockJS(serverURL);
       this.stompClient = Stomp.over(socket);
 
@@ -78,20 +91,25 @@ export default {
         (error) => {
           // 소켓 연결 실패
           console.log("소켓 연결 실패", error);
-        }
+          console.log("재연결 시도...");
+          //3초 후 재연결 시도
+          setTimeout(() => {
+            this.connect();
+          }, 3000);
+        },
+        null,
+        "1.2"
       );
     },
     dmRoom() {
       // 채팅방 정보 가져오기
-      // const data = {
-      //   dmRoomId: this.list.dmRoomId,
-      //   memberProfile: {
-      //     memberId: this.list.memberId,
-      //     profileImageUrl: this.list.profileImageUrl,
-      //     nickname: this.list.nickname,
-      //   },
-      // };
-      // console.log(data);
+      const data = {
+        dmRoomId: this.list.dmRoomId,
+        memberId: this.list.memberId,
+        profileImageUrl: this.list.profileImageUrl,
+        nickname: this.list.nickname,
+      };
+      console.log(data);
       this.$axios
         .get(`/dm-rooms/${this.list.dmRoomId}`, {
           params: {
