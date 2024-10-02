@@ -16,8 +16,8 @@
       placeholder="내용 입력 후 엔터"
     />
     <div v-for="(item, idx) in dmMessages" :key="idx">
-      <h3>유저이름: {{ item.senderId }}</h3>
-      <h3>내용: {{ item.content }}</h3>
+      <h3>유저이름: {{ item.nickname }}</h3>
+      <h3>내용: {{ item.allMessage.content }}</h3>
       <br />
     </div>
   </div>
