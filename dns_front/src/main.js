@@ -2,19 +2,19 @@ import Vue from "vue";
 import App from "./App.vue";
 import store from "./store";
 import vuetify from "./plugins/vuetify";
-import io from "socket.io-client";
+import SockJS from "sockjs-client"; // SockJS 임포트
+import Stomp from "webstomp-client"; // STOMP 프로토콜을 사용하기 위해 Stomp 임포트
 import axios from "axios";
 Vue.prototype.$axios = axios;
 
-//소켓 관련 설정
-const socket = io("http://localhost:8080", {
-  transports: ["websocket"],
-  withCredentials: true,
-});
-//전역으로 소켓을 사용할 수 있게 등록
-Vue.prototype.$socket = socket;
+// SockJS 관련 설정
+const socket = new SockJS("http://localhost:8080/ws-stomp"); // SockJS 서버 URL
+const stompClient = Stomp.over(socket); // STOMP 클라이언트 생성
 
-//vuetify 스타일 추가
+// 전역으로 STOMP 클라이언트를 사용할 수 있게 등록
+Vue.prototype.$stompClient = stompClient;
+
+// Vuetify 스타일 추가
 import "vuetify/dist/vuetify.min.css";
 import router from "./router/router";
 
