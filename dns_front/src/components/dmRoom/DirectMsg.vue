@@ -86,9 +86,7 @@ export default {
           setTimeout(() => {
             this.connect();
           }, 3000);
-        },
-        null,
-        "1.2"
+        }
       );
     },
     dmRoom() {
