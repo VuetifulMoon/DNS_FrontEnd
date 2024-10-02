@@ -2,8 +2,8 @@ import Vue from "vue";
 import App from "./App.vue";
 import store from "./store";
 import vuetify from "./plugins/vuetify";
-import SockJS from "sockjs-client"; // SockJS 임포트
-import Stomp from "webstomp-client"; // STOMP 프로토콜을 사용하기 위해 Stomp 임포트
+import SockJS from "sockjs-client";
+import Stomp from "webstomp-client";
 import axios from "axios";
 Vue.prototype.$axios = axios;
 
