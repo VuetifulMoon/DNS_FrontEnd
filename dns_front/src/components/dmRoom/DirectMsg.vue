@@ -83,18 +83,24 @@ export default {
     },
     dmRoom() {
       // 채팅방 정보 가져오기
-      const data = {
-        dmRoomId: this.list.dmRoomId,
-        memberProfile: {
-          memberId: this.list.memberId,
-          profileImageUrl: this.list.profileImageUrl,
-          nickname: this.list.nickname,
-        },
-      };
-      console.log(data);
-
+      // const data = {
+      //   dmRoomId: this.list.dmRoomId,
+      //   memberProfile: {
+      //     memberId: this.list.memberId,
+      //     profileImageUrl: this.list.profileImageUrl,
+      //     nickname: this.list.nickname,
+      //   },
+      // };
+      // console.log(data);
       this.$axios
-        .get(`/dm-rooms/${this.list.dmRoomId}`, data)
+        .get(`/dm-rooms/${this.list.dmRoomId}`, {
+          params: {
+            dmRoomId: this.list.dmRoomId,
+            memberId: this.list.memberId,
+            profileImageUrl: this.list.profileImageUrl,
+            nickname: this.list.nickname,
+          },
+        })
         .then((res) => {
           this.dmMessages = res.data;
         })
