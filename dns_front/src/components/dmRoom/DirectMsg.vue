@@ -1,10 +1,23 @@
 <template>
   <div v-if="list">
     {{ list.dmRoomId }}번 채팅방<br />
-    내용: <input v-model="dmMessage" type="text" @keyup="sendMessage" />
+    내용:
+    <input
+      v-model="dmMessage"
+      type="text"
+      @keyup="sendMessage"
+      style="
+         {
+          border: 1px solid black;
+          width: 200px;
+          height: 20px;
+        }
+      "
+      placeholder="내용 입력 후 엔터"
+    />
     <div v-for="(item, idx) in dmMessages" :key="idx">
-      <h3>유저이름: {{ item.nickname }}</h3>
-      <h3>내용: {{ item.dmMessage }}</h3>
+      <h3>유저이름: {{ item.senderId }}</h3>
+      <h3>내용: {{ item.content }}</h3>
       <br />
     </div>
   </div>
@@ -54,7 +67,9 @@ export default {
       console.log("Send message:" + this.dmMessage);
       if (this.stompClient && this.stompClient.connected) {
         const dm = {
-          userId: this.userId,
+          dmRoomId: this.list.dmRoomId,
+          senderId: this.memberId,
+          LocalDateTime: new Date(),
           dmMessage: this.dmMessage,
         };
         this.stompClient.send("/pub/dm-message", JSON.stringify(dm), {});
