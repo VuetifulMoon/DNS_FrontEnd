@@ -69,8 +69,8 @@ export default {
         const dm = {
           dmRoomId: this.list.dmRoomId,
           senderId: this.memberId,
-          LocalDateTime: new Date(),
-          dmMessage: this.dmMessage,
+          time: new Date(),
+          content: this.dmMessage,
         };
         this.stompClient.send("/pub/dm-message", JSON.stringify(dm), {});
       }
@@ -90,7 +90,7 @@ export default {
           this.stompClient.subscribe(`/sub/dm/${this.list.dmRoomId}`, (res) => {
             console.log("구독 성공 결과 : ", res.body);
             // 메시지 배열에 추가
-            this.dmMessages.push(JSON.parse(res.body));
+            this.dmMessages.allMessage.push(JSON.parse(res.body));
           });
         },
         (error) => {
