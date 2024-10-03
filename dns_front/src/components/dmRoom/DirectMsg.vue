@@ -17,7 +17,7 @@
     />
     <div v-for="(item, idx) in dmMessages" :key="idx">
       <h3>유저이름: {{ item.nickname }}</h3>
-      <h3>내용: {{ item.allMessage.content }}</h3>
+      <h3>내용: {{ item.allMessages.content }}</h3>
       <br />
     </div>
   </div>
