@@ -5,7 +5,7 @@
     <input
       v-model="dmMessage"
       type="text"
-      @keyup="sendMessage"
+      @keyup.enter="sendMessage"
       style="
          {
           border: 1px solid black;
@@ -15,12 +15,14 @@
       "
       placeholder="내용 입력 후 엔터"
     />
-    <div v-for="(item, idx) in dmMessages" :key="idx">
-      <h3>유저이름: {{ item.nickname }}</h3>
-      <h3>내용: {{ item.allMessages.content }}</h3>
+    <div v-for="(item, idx) in dmMessages.allMessages" :key="idx">
+      <h3>유저이름: {{ item.senderId }}</h3>
+      <h3>내용: {{ item.content }}</h3>
+      <h3>시간 : {{ item.time }}</h3>
       <br />
     </div>
   </div>
+  <div v-else>DM 리스트를 불러오는 중입니다</div>
 </template>
 
 <script>
@@ -39,7 +41,7 @@ export default {
     return {
       memberId: 1,
       dmMessage: "",
-      dmMessages: [],
+      dmMessages: {},
       stompClient: null, // Stomp 클라이언트 초기화
     };
   },
@@ -57,7 +59,7 @@ export default {
   methods: {
     sendMessage(e) {
       // Enter 키와 입력값이 있을 때 메시지 전송
-      if (e.keyCode === 13 && this.dmMessage !== "") {
+      if (this.dmMessage !== "") {
         this.send();
         this.dmMessage = "";
       }
