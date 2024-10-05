@@ -50,5 +50,10 @@ export default new VueRouter({
       name: "memberSignup",
       component: () => import("../components/member/MemberSingup.vue"),
     },
+    {
+      path: "/board",
+      name: "board",
+      component: () => import("../views/Board.vue"),
+    },
   ],
 });
