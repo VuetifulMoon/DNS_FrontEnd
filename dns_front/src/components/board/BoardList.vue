@@ -55,6 +55,8 @@
       </div>
       <div v-else>댓글 숨겨짐</div>
     </div>
+    <input type="text" v-model="comment" placeholder="댓글 달기" />
+    <button @click="postComment">작성</button>
   </div>
 </template>
 <script>
@@ -76,6 +78,7 @@ export default {
       isReply: false,
       editBoardText: "",
       editBoardImages: [],
+      comment: "",
     };
   },
   methods: {
@@ -96,6 +99,25 @@ export default {
             console.log(err);
           })
       );
+    },
+    postComment() {
+      const comment = {
+        memberId: 1,
+        commentContent: this.comment,
+      };
+      this.$axios
+        .post(`/posts/${this.post.postId}/comments`, comment)
+        .then((res) => {
+          if (res.status == 201) {
+            alert("댓글 작성이 완료되었습니다");
+          } else {
+            alert("실패했습니다. 다시 시도해주세요.");
+          }
+          this.postComment = "";
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     //게시물 수정 상태 true <> false
     editBoard() {
