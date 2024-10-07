@@ -12,6 +12,8 @@
           삭제
         </button>
       </div>
+      <input type="text" v-model="reply" placeholder="대댓글 달기" />
+      <button @click="postReply">작성</button>
     </ul>
     <!-- 수정 상태가 true -->
     <ul v v-else>
@@ -62,6 +64,7 @@ export default {
     return {
       editCommentText: "",
       isComment: false,
+      reply: "",
     };
   },
   methods: {
@@ -90,6 +93,28 @@ export default {
         })
         .catch((err) => {
           console.error(err);
+        });
+    },
+    postReply() {
+      const reply = {
+        memberId: 1,
+        commentContent: this.reply,
+      };
+      this.$axios
+        .post(
+          `/posts/${this.post.postId}/comments?parentCommentId=${this.comment.commentId}`,
+          reply
+        )
+        .then((res) => {
+          if (res.status == 201) {
+            alert("대댓글 작성이 완료되었습니다");
+          } else {
+            alert("실패했습니다. 다시 시도해주세요.");
+          }
+          this.reply = "";
+        })
+        .catch((err) => {
+          console.log(err);
         });
     },
     //댓글 삭제
