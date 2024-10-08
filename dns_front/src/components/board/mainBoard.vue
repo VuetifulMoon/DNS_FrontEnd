@@ -1,9 +1,32 @@
 <template>
   <div>
+    <button @click="postBoard()">게시물 작성</button>
     <ul>
-      <li v-for="post in posts" :key="post.postId">
+      <li v-for="(post, idx) in posts" :key="idx">
         <BoardList :post="post" />
       </li>
+      <div v-if="isPost === true">
+        <div>
+          <input type="file" multiple v-on:change="upLoadImg" /><br />
+          <div v-if="boardImage.length">
+            <img
+              v-for="(image, idx) in boardImage"
+              :key="idx"
+              :src="image.image"
+              style="width: 100px; height: 100px"
+            />
+          </div>
+          프로필 이미지 닉네임
+          <input
+            type="text"
+            v-model="boardText"
+            style="border: 1px solid black"
+            placeholder="작성할 내용을 입력"
+          />
+          <button @click="POST_BOARD()">작성완료</button>
+          <button>취소</button>
+        </div>
+      </div>
     </ul>
   </div>
 </template>
@@ -18,35 +41,59 @@ export default {
   },
   data() {
     return {
-      posts: [
-        {
-          memberId: 1,
-          postId: 1,
-          profile: "프로필 이미지",
-          nickName: "Canelo",
-          createdAt: "5분 전",
-          contents: "저녁먹고싶다.",
-          images: ["게시글 사진1", "게시글 사진2"],
-        },
-      ],
+      boardText: "",
+      boardImage: [],
+      isPost: false,
+      posts: [],
     };
   },
   methods: {
-    //게시글 목록 조회
-    // fetchBoard() {
-    //   return (
-    //     this.$axios
-    //       // .get("http://172.16.101.131:8080/posts")
-    //       .get("/posts")
-    //       .then((res) => {
-    //         console.log("통신 결과값 :" + res);
-    //         this.posts.push(res.data);
-    //       })
-    //       .catch((err) => {
-    //         console.log(err);
-    //       })
-    //   );
-    // },
+    upLoadImg(e) {
+      const files = e.target.files;
+      this.boardImage = []; // 기존 이미지 배열 초기화
+
+      for (let i = 0; i < files.length; i++) {
+        let image = window.URL.createObjectURL(files[i]);
+        this.boardImage.push(image); // 배열에 이미지 URL 추가
+      }
+    },
+    // 게시글 목록 조회
+    fetchBoard() {
+      return (
+        this.$axios
+          // .get("http://172.16.101.131:8080/posts")
+          .get("/posts?page=0")
+          .then((res) => {
+            console.log(res.data.content);
+            this.posts = res.data.content;
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+      );
+    },
+    postBoard() {
+      this.isPost = !this.isPost;
+    },
+    POST_BOARD() {
+      console.log(typeof this.boardImage);
+      const data = {
+        content: this.boardText,
+        images: this.boardImage,
+      };
+      this.$axios
+        .post("/posts", data)
+        .then((res) => {
+          if (res.status == 201) {
+            alert("게시물 작성이 완료되었습니다");
+          } else {
+            alert("작성을 실패하였습니다. 다시 시도해라");
+          }
+        })
+        .catch((err) => {
+          alert(err.message);
+        });
+    },
   },
 };
 </script>
