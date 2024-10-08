@@ -19,22 +19,22 @@ export default new VueRouter({
       name: "dm-roomList",
       component: () => import("../components/dmRoom/DirectMsgList.vue"),
     },
-    {
-      path: "/dm-rooms/:dmRoomId",
-      name: "dm-room",
-      component: () => import("../components/dmRoom/DirectMsg.vue"),
-      props: (route) => ({ list: route.params.list }),
-    },
+    // {
+    //   path: "/dm-rooms/:dmRoomId",
+    //   name: "dm-room",
+    //   component: () => import("../components/dmRoom/DirectMsg.vue"),
+    //   props: (route) => ({ list: route.params.list }),
+    // },
     {
       path: "/posts",
       name: "mainBoard",
       component: () => import("../components/board/MainBoard.vue"),
     },
-    {
-      path: "/posts/:postId/comments",
-      name: "reply",
-      component: () => import("../components/reply/Reply.vue"),
-    },
+    // {
+    //   path: "/posts/:postId/comments",
+    //   name: "reply",
+    //   component: () => import("../components/reply/Reply.vue"),
+    // },
     {
       path: "/notification/:memberId",
       name: "notification",
