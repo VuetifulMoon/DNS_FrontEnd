@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="boardItem">
+    <div v-if="isBoard == false" class="boardItem">
       <div class="profile">
         <v-img
           lazy-src="https://picsum.photos/id/11/10/6"
@@ -12,7 +12,7 @@
         <div class="profileInfo">{{ post.nickName }}</div>
       </div>
 
-      <v-icon class="invisibleMenu">mdi-menu</v-icon>
+      <v-icon @click="editBoard" class="invisibleMenu">mdi-menu</v-icon>
 
       <v-img
         lazy-src="https://picsum.photos/id/11/10/6"
@@ -29,8 +29,34 @@
 
       <div class="boardCreatedAt">{{ post.createdAt }}</div>
       <div class="boardContent">{{ post.postContent }}</div>
-
       <hr class="hr" />
+    </div>
+    <div v-else>
+      <div>
+        멤버 ID : {{ post.memberId }}<br />
+        {{ post.profile }}
+        {{ post.nickName }}
+        {{ post.createdAt }}<br />
+        <!-- 이미지 for문 -->
+        <!-- <input type="file" multiple /><br /> -->
+        <v-file-input
+          width="200"
+          type="file"
+          v-model="editBoardImages"
+          multiple
+        />
+        <div v-if="editBoardImages.length">
+          <img
+            v-for="(image, idx) in thumbnail"
+            :key="idx"
+            :src="image"
+            style="width: 100px; height: 100px"
+          />
+        </div>
+        <input type="text" v-model="editBoardText" />
+      </div>
+      <button @click="EDIT_BOARD()">수정완료</button>
+      <button @click="editBoardCancel()">취소</button>
     </div>
     <div class="comment">
       <div v-if="isComment === true">
@@ -73,6 +99,7 @@ export default {
   components: { Reply, Comment, InfiniteLoading },
   data() {
     return {
+      memberId: 1,
       comments: [],
       isComment: false,
       isBoard: false,
@@ -81,9 +108,48 @@ export default {
       editBoardImages: [],
       comment: "",
       commentId: 1,
+      thumbnail: [],
     };
   },
   methods: {
+    //게시물 수정 상태 true <> false
+    editBoard() {
+      this.isBoard = !this.isBoard;
+      this.editBoardText = this.post.postContent;
+      // this.editBoardImages.push(this.post.images);
+      for (let i = 0; i < this.post.images.length; i++) {
+        let image = window.URL.createObjectURL(this.post.images[i]);
+        this.thumbnail.push(image);
+        this.editBoardImages.push(this.post.images[i]); // 배열에 파일 자체를 저장
+      }
+    },
+    editBoardCancel() {
+      this.isBoard = false;
+      this.editBoardText = "";
+      this.editBoardImages = [];
+    },
+    //게시물 수정
+    EDIT_BOARD() {
+      //formData 객체 생성
+      const formData = new FormData();
+
+      formData.append("postContent", this.editBoardText); //게시물 수정 내용
+
+      this.editBoardImages.forEach((img) => {
+        formData.append("images", img); // 이미지 추가
+      });
+      formData.append("memberId", this.memberId);
+
+      this.$axios.patch(`/posts/${this.post.postId}`, formData).then((res) => {
+        if (res.state == 202) {
+          alert("수정이 완료되었습니다.");
+          this.isBoard = false;
+        } else {
+          alert("실패했습니다. 다시 시도해주세요.");
+          this.isBoard = false;
+        }
+      });
+    },
     //댓글 작성
     postComment() {
       const comment = {
@@ -145,6 +211,26 @@ export default {
           this.isReply = !this.isReply;
           console.log(this.comments[0].reply);
         });
+    },
+    //게시물 삭제
+    deleteBoard(postId) {
+      //로그인한 멤버id랑 비교하는거로 수정해야함
+      if (this.post.memberId == 1) {
+        this.$axios
+          .delete(`/post/${postId}`)
+          .then((res) => {
+            if (res.status == 200) {
+              alert("삭제가 완료되었습니다.");
+            } else if (res.status == 400) {
+              alert("존재하지 않는 게시물입니다.");
+            } else {
+              alert("삭제를 실패했습니다. 다시 시도해주세요.");
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      }
     },
   },
 };
