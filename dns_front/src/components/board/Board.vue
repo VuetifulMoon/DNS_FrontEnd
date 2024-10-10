@@ -34,6 +34,8 @@
     </div>
     <div class="comment">
       <div v-if="isComment === true">
+        <input type="text" v-model="comment" placeholder="댓글 달기" />
+        <button @click="postComment">작성</button>
         <ul>
           <li v-for="comment in comments" :key="comment.commentId">
             <hr />
@@ -82,6 +84,26 @@ export default {
     };
   },
   methods: {
+    //댓글 작성
+    postComment() {
+      const comment = {
+        memberId: 1,
+        commentContent: this.comment,
+      };
+      this.$axios
+        .post(`/posts/${this.post.postId}/comments`, comment)
+        .then((res) => {
+          if (res.status == 201) {
+            alert("댓글 작성이 완료되었습니다");
+          } else {
+            alert("실패했습니다. 다시 시도해주세요.");
+          }
+          this.comment = "";
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
     fetchComment($state) {
       this.isComment = true;
       let url = `/posts/${this.post.postId}/comments`;
