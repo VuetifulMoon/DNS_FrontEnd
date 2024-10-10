@@ -85,7 +85,8 @@ export default {
 
       console.log(`소켓 연결시도 : ${serverURL}`);
       this.stompClient.connect(
-        {},
+        //20초 단위로 하트비트 설정
+        { heartbeat: { outgoing: 20000, incoming: 20000 } },
         (frame) => {
           // 소켓 연결 성공
           console.log("소켓 연결 성공", frame);
