@@ -23,7 +23,7 @@
       ></v-img>
 
       <div class="icon">
-        <v-icon @click="fetchComment(post.postId)">mdi-chat</v-icon>
+        <v-icon @click="fetchComment">mdi-chat</v-icon>
         <v-icon>mdi-send</v-icon>
       </div>
 
@@ -36,10 +36,9 @@
       <div v-if="isComment === true">
         <ul>
           <li v-for="comment in comments" :key="comment.commentId">
+            <hr />
             <Comment :post="post" :comment="comment" />
             <button @click="fetchReply(comment.commentId)">댓글 더보기</button>
-            <br />
-            <br />
             <br />
             <div v-if="isReply === true">
               <ul v-for="(reply, idx) in comment.reply" :key="idx">
@@ -48,14 +47,20 @@
             </div>
           </li>
         </ul>
+        <infinite-loading
+          @infinite="fetchComment"
+          spinner="spiral"
+          :scrollable-target="'.comment'"
+        ></infinite-loading>
       </div>
-      <div v-else>댓글 숨겨짐</div>
     </div>
   </div>
 </template>
 
 <script>
 import Comment from "@/components/reply/Comment.vue";
+import InfiniteLoading from "vue-infinite-loading";
+import Reply from "@/components/reply/Reply.vue";
 export default {
   props: {
     post: {
@@ -63,7 +68,7 @@ export default {
       required: true,
     },
   },
-  components: { Comment },
+  components: { Reply, Comment, InfiniteLoading },
   data() {
     return {
       comments: [],
@@ -73,26 +78,38 @@ export default {
       editBoardText: "",
       editBoardImages: [],
       comment: "",
+      commentId: 1,
     };
   },
   methods: {
-    //댓글 목록 조회
-    fetchComment(postId) {
-      this.isComment = !this.isComment;
-      console.log(this.post.content);
-      return (
-        this.$axios
-          // .get(`http://172.16.101.131:8080//post/${this.post.postId}/comments`)
-          .get(`/posts/${postId}/comments`)
-          .then((res) => {
-            console.log("통신 성공!");
-            console.log(res);
-            this.comments = res.data.content;
-          })
-          .catch((err) => {
-            console.log(err);
-          })
-      );
+    fetchComment($state) {
+      this.isComment = true;
+      let url = `/posts/${this.post.postId}/comments`;
+
+      if (this.commentId > 1) {
+        url = `/posts/${this.post.postId}/comments?lastCommentId=${this.commentId}`;
+      }
+      this.$axios
+        .get(url)
+        .then((res) => {
+          if (res.data.content.length > 0) {
+            this.comments = [...this.comments, ...res.data.content];
+            this.commentId =
+              res.data.content[res.data.content.length - 1].commentId;
+
+            // 데이터가 더 이상 없으면 complete 호출
+            if (res.data.content.length < 10) {
+              if ($state) $state.complete();
+            } else {
+              if ($state) $state.loaded();
+            }
+          } else {
+            if ($state) $state.complete();
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     //대댓글 상태
     fetchReply(commentId) {
@@ -104,6 +121,7 @@ export default {
           });
           this.comments[index].reply = res.data.content;
           this.isReply = !this.isReply;
+          console.log(this.comments[0].reply);
         });
     },
   },
@@ -117,7 +135,6 @@ export default {
 }
 .boardItem {
   position: relative;
-  background-color: aqua;
 }
 .profile {
   display: flex;
@@ -160,7 +177,6 @@ export default {
   display: flex;
   justify-content: center;
   height: 442px;
-  overflow-y: scroll;
-  background-color: blue;
+  overflow-y: auto;
 }
 </style>
