@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <div>NickName</div>
     <button>새로운 메세지 생성</button>
     멤버아이디 : {{ list.memberId }}
     <br />

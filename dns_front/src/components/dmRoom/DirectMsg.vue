@@ -57,7 +57,7 @@ export default {
   },
 
   methods: {
-    sendMessage(e) {
+    sendMessage() {
       // Enter 키와 입력값이 있을 때 메시지 전송
       if (this.dmMessage !== "") {
         this.send();
