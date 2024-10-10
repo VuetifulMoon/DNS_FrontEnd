@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 수정 상태가 false -->
-    <ul v v-if="isComment == false">
+    <div v-if="isComment == false">
       <div>
         댓글번호 : {{ comment.commentId }}
         {{ comment.memberProfileImage }}
@@ -14,19 +14,17 @@
       </div>
       <input type="text" v-model="reply" placeholder="대댓글 달기" />
       <button @click="postReply">작성</button>
-    </ul>
+    </div>
     <!-- 수정 상태가 true -->
-    <ul v v-else>
-      <div>
-        {{ comment.memberProfileImage }}
-        {{ comment.memberNickName }}<br />
-        <input type="text" v-model="editCommentText" />
-        <button @click="EDIT_Comment(post.postId, comment.commentId)">
-          수정완료
-        </button>
-        <button @click="editComment()">취소</button>
-      </div>
-    </ul>
+    <div v-else>
+      {{ comment.memberProfileImage }}
+      {{ comment.memberNickName }}<br />
+      <input type="text" v-model="editCommentText" />
+      <button @click="EDIT_Comment(post.postId, comment.commentId)">
+        수정완료
+      </button>
+      <button @click="editComment()">취소</button>
+    </div>
   </div>
 </template>
 <script>
@@ -80,10 +78,11 @@ export default {
     },
     //댓글 수정
     EDIT_Comment(postId, commentId) {
+      const data = { memberId: 1, commentContent: this.editCommentText };
       this.$axios
-        .patch(`/posts/${postId}/comments/${commentId}`, this.editCommentText)
+        .patch(`/posts/${postId}/comments/${commentId}`, data)
         .then((res) => {
-          if (res.state == 202) {
+          if (res.state == 200) {
             alert("수정이 완료되었습니다.");
             this.isComment = false;
           } else {
