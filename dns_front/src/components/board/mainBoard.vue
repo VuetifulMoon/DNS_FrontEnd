@@ -12,7 +12,7 @@
             <img
               v-for="(image, idx) in boardImage"
               :key="idx"
-              :src="image.image"
+              :src="image"
               style="width: 100px; height: 100px"
             />
           </div>
@@ -45,6 +45,7 @@ export default {
       boardImage: [],
       isPost: false,
       posts: [],
+      memberId: 1,
     };
   },
   methods: {
@@ -53,10 +54,10 @@ export default {
       this.boardImage = []; // 기존 이미지 배열 초기화
 
       for (let i = 0; i < files.length; i++) {
-        let image = window.URL.createObjectURL(files[i]);
-        this.boardImage.push(image); // 배열에 이미지 URL 추가
+        this.boardImage.push(files[i]); // 배열에 파일 자체를 저장
       }
     },
+
     // 게시글 목록 조회
     fetchBoard() {
       return (
@@ -76,15 +77,20 @@ export default {
       this.isPost = !this.isPost;
     },
     POST_BOARD() {
-      console.log(typeof this.boardImage);
-      const data = {
-        content: this.boardText,
-        images: this.boardImage,
-      };
+      //formData 객체 생성
+      const formData = new FormData();
+
+      formData.append("postContent", this.boardText); // 게시물 텍스트 추가
+
+      this.boardImage.forEach((img) => {
+        formData.append("images", img); // 파일 추가
+      });
+      formData.append("memberId", this.memberId);
+
       this.$axios
-        .post("/posts", data)
+        .post("/posts", formData)
         .then((res) => {
-          if (res.status == 201) {
+          if (res.status === 201) {
             alert("게시물 작성이 완료되었습니다");
           } else {
             alert("작성을 실패하였습니다. 다시 시도해라");

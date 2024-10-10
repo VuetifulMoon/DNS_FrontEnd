@@ -11,12 +11,15 @@
         {{ post.createdAt }}<br />
         <!-- 이미지 for문 -->
         <div v-for="(image, idx) in post.images" :key="idx">
-          {{ image }}
+          <img :src="image" alt="사진" />
         </div>
         {{ post.postContent }}
       </div>
-      <button @click="editBoard()">수정</button>
-      <button @click="deleteBoard(post.postId)">삭제</button>
+      <!-- 내가 작성한 게시물이면 수정,삭제 가능 -->
+      <div v-if="post.memberId === this.memberId">
+        <button @click="editBoard()">수정</button>
+        <button @click="deleteBoard(post.postId)">삭제</button>
+      </div>
     </div>
     <div v-else>
       <div>
@@ -25,11 +28,22 @@
         {{ post.nickName }}
         {{ post.createdAt }}<br />
         <!-- 이미지 for문 -->
-        <input type="file" multiple /><br />
-        <v-file-input full-width="200" type="text" v-model="editBoardText" />
-        <div v-for="(image, idx) in post.images" :key="idx">
-          {{ image }}
+        <!-- <input type="file" multiple /><br /> -->
+        <v-file-input
+          width="200"
+          type="file"
+          v-model="editBoardImages"
+          multiple
+        />
+        <div v-if="editBoardImages.length">
+          <img
+            v-for="(image, idx) in thumbnail"
+            :key="idx"
+            :src="image"
+            style="width: 100px; height: 100px"
+          />
         </div>
+        <input type="text" v-model="editBoardText" />
       </div>
       <button @click="EDIT_BOARD()">수정완료</button>
       <button @click="editBoardCancel()">취소</button>
@@ -72,6 +86,7 @@ export default {
   },
   data() {
     return {
+      memberId: 1,
       comments: [],
       isComment: false,
       isBoard: false,
@@ -79,6 +94,7 @@ export default {
       editBoardText: "",
       editBoardImages: [],
       comment: "",
+      thumbnail: [],
     };
   },
   methods: {
@@ -123,7 +139,12 @@ export default {
     editBoard() {
       this.isBoard = !this.isBoard;
       this.editBoardText = this.post.postContent;
-      this.editBoardImages.push(this.post.images);
+      // this.editBoardImages.push(this.post.images);
+      for (let i = 0; i < this.post.images.length; i++) {
+        let image = window.URL.createObjectURL(this.post.images[i]);
+        this.thumbnail.push(image);
+        this.editBoardImages.push(this.post.images[i]); // 배열에 파일 자체를 저장
+      }
     },
     editBoardCancel() {
       this.isBoard = false;
@@ -132,11 +153,17 @@ export default {
     },
     //게시물 수정
     EDIT_BOARD() {
-      const editBoard = {
-        text: this.editBoardText,
-        images: this.editBoardImages,
-      };
-      this.$axios.patch(`/posts/${this.post.postId}`, editBoard).then((res) => {
+      //formData 객체 생성
+      const formData = new FormData();
+
+      formData.append("postContent", this.editBoardText); //게시물 수정 내용
+
+      this.editBoardImages.forEach((img) => {
+        formData.append("images", img); // 이미지 추가
+      });
+      formData.append("memberId", this.memberId);
+
+      this.$axios.patch(`/posts/${this.post.postId}`, formData).then((res) => {
         if (res.state == 202) {
           alert("수정이 완료되었습니다.");
           this.isBoard = false;
@@ -164,7 +191,7 @@ export default {
       //로그인한 멤버id랑 비교하는거로 수정해야함
       if (this.post.memberId == 1) {
         this.$axios
-          .delete(`/post/${postId}`)
+          .delete(`/posts/${postId}`)
           .then((res) => {
             if (res.status == 204) {
               alert("삭제가 완료되었습니다.");
