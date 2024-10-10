@@ -7,10 +7,12 @@
         {{ comment.memberProfileImage }}
         {{ comment.memberProfile.nickname }}<br />
         {{ comment.commentContent }}
-        <button @click="editComment()">수정</button>
-        <button @click="deleteComment(post.postId, comment.commentId)">
-          삭제
-        </button>
+        <div v-if="comment.memberProfile.memberId === this.memberId">
+          <button @click="editComment()">수정</button>
+          <button @click="deleteComment(post.postId, comment.commentId)">
+            삭제
+          </button>
+        </div>
       </div>
       <input type="text" v-model="reply" placeholder="대댓글 달기" />
       <button @click="postReply">작성</button>
@@ -35,25 +37,6 @@ export default {
       required: true,
     },
     comment: {
-      //       "content": [
-      // {
-      // "commentId": 12,
-      // "postId": 2,
-      // "memberProfile": {
-      // "memberId": 1,
-      // "profileImageUrl": "a"
-      // "nickname": "a"
-      // },
-      // "commentContent": "12",
-      // "createdAt": "2024-09-18T16:02:54"
-      // "updatedAt": null,
-      // "parentCommentId": null,
-      // "deleted": false
-      // ] ,
-      // "pageNumber": 0,
-      // "size": 10,
-      // "first": true,
-      // "last": true
       type: Object,
       required: true,
     },
@@ -63,6 +46,7 @@ export default {
       editCommentText: "",
       isComment: false,
       reply: "",
+      memberId: 1,
     };
   },
   methods: {
