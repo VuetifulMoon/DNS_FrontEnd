@@ -103,9 +103,11 @@ export default {
     //댓글 삭제
     deleteComment(postId, commentId) {
       //로그인한 멤버id랑 비교하는거로 수정해야함
-      if (this.comments.memberId == 1) {
+      if (this.comment.memberProfile.memberId === this.memberId) {
         this.$axios
-          .delete(`/posts/${postId}/comments/${commentId}`)
+          .delete(
+            `/posts/${postId}/comments/${commentId}?memberId=${this.memberId}`
+          )
           .then((res) => {
             if (res.status == 204) {
               alert("삭제가 완료되었습니다.");
