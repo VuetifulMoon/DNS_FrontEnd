@@ -55,8 +55,8 @@
         </div>
         <input type="text" v-model="editBoardText" />
       </div>
-      <button @click="EDIT_BOARD()">수정완료</button>
-      <button @click="editBoardCancel()">취소</button>
+      <button @click="EDIT_BOARD()">(수정완료)</button>
+      <button @click="editBoardCancel()">(취소)</button>
     </div>
     <div class="comment">
       <div v-if="isComment === true">

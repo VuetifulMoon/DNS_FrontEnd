@@ -8,9 +8,9 @@
         {{ comment.memberProfile.nickname }}<br />
         {{ comment.commentContent }}
         <div v-if="comment.memberProfile.memberId === this.memberId">
-          <button @click="editComment()">수정</button>
+          <button @click="editComment()">(수정)</button>
           <button @click="deleteComment(post.postId, comment.commentId)">
-            삭제
+            (삭제)
           </button>
         </div>
       </div>
@@ -23,9 +23,9 @@
       {{ comment.memberNickName }}<br />
       <input type="text" v-model="editCommentText" />
       <button @click="EDIT_Comment(post.postId, comment.commentId)">
-        수정완료
+        (수정완료)
       </button>
-      <button @click="editComment()">취소</button>
+      <button @click="editComment()">(취소)</button>
     </div>
   </div>
 </template>
@@ -66,7 +66,7 @@ export default {
       this.$axios
         .patch(`/posts/${postId}/comments/${commentId}`, data)
         .then((res) => {
-          if (res.state == 200) {
+          if (res.status == 200) {
             alert("수정이 완료되었습니다.");
             this.isComment = false;
           } else {

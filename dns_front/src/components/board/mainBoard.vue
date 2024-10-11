@@ -23,8 +23,8 @@
             style="border: 1px solid black"
             placeholder="작성할 내용을 입력"
           />
-          <button @click="POST_BOARD()">작성완료</button>
-          <button>취소</button>
+          <button @click="POST_BOARD()">(작성완료)</button>
+          <button>(취소)</button>
         </div>
       </div>
     </ul>
