@@ -141,7 +141,7 @@ export default {
       formData.append("memberId", this.memberId);
 
       this.$axios.patch(`/posts/${this.post.postId}`, formData).then((res) => {
-        if (res.state == 202) {
+        if (res.status == 202) {
           alert("수정이 완료되었습니다.");
           this.isBoard = false;
         } else {
