@@ -93,7 +93,7 @@ export default {
           this.stompClient.subscribe(`/sub/dm/${this.list.dmRoomId}`, (res) => {
             console.log("구독 성공 결과 : ", res.body);
             // 메시지 배열에 추가
-            this.dmMessages.allMessage.push(JSON.parse(res.body));
+            this.dmMessages.allMessages.push(JSON.parse(res.body));
           });
         },
         (error) => {
