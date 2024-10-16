@@ -1,5 +1,5 @@
 <template>
-  <div class="container" v-if="isComment === true">
+  <div class="container">
     <div v-if="isBoard == false" class="boardItem">
       <div class="profile">
         <img
