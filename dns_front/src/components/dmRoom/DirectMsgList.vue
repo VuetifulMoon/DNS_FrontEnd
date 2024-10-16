@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <button>새로운 메세지 생성</button>
+    <button>새로운 메세지 생성</button><br />
     멤버아이디 : {{ list.memberId }}
     <br />
     닉네임 : {{ list.nickname }}

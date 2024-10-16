@@ -1,15 +1,13 @@
 <template>
-  <div class="container">
+  <div class="container" v-if="isComment === true">
     <div v-if="isBoard == false" class="boardItem">
       <div class="profile">
-        <v-img
+        <img
           lazy-src="https://picsum.photos/id/11/10/6"
-          max-height="100"
-          max-width="100"
-          src="https://picsum.photos/id/11/500/300"
+          :src="post.profileUrl"
           class="profileImg"
-        ></v-img>
-        <div class="profileInfo">{{ post.nickName }}</div>
+        />
+        <div class="profileInfo">{{ post.nickname }}</div>
       </div>
 
       <v-icon @click="editBoard" class="invisibleMenu">mdi-menu</v-icon>
@@ -33,9 +31,8 @@
     </div>
     <div v-else>
       <div>
-        멤버 ID : {{ post.memberId }}<br />
         {{ post.profile }}
-        {{ post.nickName }}
+        {{ post.nickname }}
         {{ post.createdAt }}<br />
         <!-- 이미지 for문 -->
         <!-- <input type="file" multiple /><br /> -->
@@ -159,6 +156,7 @@ export default {
       this.$axios
         .post(`/posts/${this.post.postId}/comments`, comment)
         .then((res) => {
+          console.log(res);
           if (res.status == 201) {
             alert("댓글 작성이 완료되었습니다");
           } else {
@@ -240,6 +238,7 @@ export default {
 .container {
   width: 1280px;
   display: flex;
+  margin-left: 250px;
 }
 .boardItem {
   position: relative;
@@ -251,6 +250,8 @@ export default {
   padding: 10px;
 }
 .profileImg {
+  width: 50px;
+  height: 50px;
   border-radius: 100px;
 }
 .profileInfo {
