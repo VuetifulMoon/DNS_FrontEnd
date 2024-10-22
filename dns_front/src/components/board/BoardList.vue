@@ -95,6 +95,7 @@ export default {
       editBoardImages: [],
       comment: "",
       thumbnail: [],
+      image: [],
     };
   },
   methods: {
@@ -141,8 +142,9 @@ export default {
       this.editBoardText = this.post.postContent;
       // this.editBoardImages.push(this.post.images);
       for (let i = 0; i < this.post.images.length; i++) {
-        let image = window.URL.createObjectURL(this.post.images[i]);
-        this.thumbnail.push(image);
+        // let image = window.URL.createObjectURL(this.post.images[i]);
+        this.image.push(this.post.images[i]);
+        this.thumbnail.push(this.post.images[i]);
         this.editBoardImages.push(this.post.images[i]); // 배열에 파일 자체를 저장
       }
     },

@@ -10,8 +10,15 @@
         <div class="profileInfo">{{ post.nickname }}</div>
       </div>
 
-      <v-icon @click="editBoard" class="invisibleMenu">mdi-menu</v-icon>
-
+      <v-icon @click="editMenu" class="invisibleMenu">mdi-menu</v-icon>
+      <!-- 내가 작성한 게시글이면 수정,삭제 가능 -->
+      <div
+        class="hamburger"
+        v-if="isMenu === true && memberId === post.memberId"
+      >
+        <button @click="editBoard">(수정)</button>
+        <button @click="deleteBoard(post.postId)">(삭제)</button>
+      </div>
       <v-img
         lazy-src="https://picsum.photos/id/11/10/6"
         max-height="300"
@@ -46,11 +53,11 @@
           <img
             v-for="(image, idx) in thumbnail"
             :key="idx"
-            :src="image"
+            :src="image.imageUrl"
             style="width: 100px; height: 100px"
           />
         </div>
-        <input type="text" v-model="editBoardText" />
+        <input class="editBoard" type="text" v-model="editBoardText" />
       </div>
       <button @click="EDIT_BOARD()">(수정완료)</button>
       <button @click="editBoardCancel()">(취소)</button>
@@ -106,24 +113,31 @@ export default {
       comment: "",
       commentId: 1,
       thumbnail: [],
+      isMenu: false,
+      image: [],
     };
   },
   methods: {
+    editMenu() {
+      this.isMenu = !this.isMenu;
+    },
     //게시물 수정 상태 true <> false
     editBoard() {
       this.isBoard = !this.isBoard;
       this.editBoardText = this.post.postContent;
       // this.editBoardImages.push(this.post.images);
       for (let i = 0; i < this.post.images.length; i++) {
-        let image = window.URL.createObjectURL(this.post.images[i]);
-        this.thumbnail.push(image);
-        this.editBoardImages.push(this.post.images[i]); // 배열에 파일 자체를 저장
+        // let image = window.URL.createObjectURL(this.post.images[i]);
+        this.image.push(this.post.images[i]);
+        this.thumbnail.push(this.post.images[i]);
+        // this.editBoardImages.push(this.post.images[i]); // 배열에 파일 자체를 저장
       }
     },
     editBoardCancel() {
       this.isBoard = false;
       this.editBoardText = "";
       this.editBoardImages = [];
+      console.log(this.thumbnail);
     },
     //게시물 수정
     EDIT_BOARD() {
@@ -136,9 +150,10 @@ export default {
         formData.append("images", img); // 이미지 추가
       });
       formData.append("memberId", this.memberId);
+      console.log(formData);
 
       this.$axios.patch(`/posts/${this.post.postId}`, formData).then((res) => {
-        if (res.status == 202) {
+        if (res.status == 200) {
           alert("수정이 완료되었습니다.");
           this.isBoard = false;
         } else {
@@ -154,7 +169,11 @@ export default {
         commentContent: this.comment,
       };
       this.$axios
-        .post(`/posts/${this.post.postId}/comments`, comment)
+        .post(`/posts/${this.post.postId}/comments`, comment, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
         .then((res) => {
           console.log(res);
           if (res.status == 201) {
@@ -215,7 +234,7 @@ export default {
       //로그인한 멤버id랑 비교하는거로 수정해야함
       if (this.post.memberId == 1) {
         this.$axios
-          .delete(`/post/${postId}`)
+          .delete(`/posts/${postId}`)
           .then((res) => {
             if (res.status == 200) {
               alert("삭제가 완료되었습니다.");
@@ -242,6 +261,22 @@ export default {
 }
 .boardItem {
   position: relative;
+}
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  width: 100px;
+  height: 50px;
+  position: absolute;
+  top: 40px;
+  right: -80px;
+  z-index: 10;
+}
+.hamburger > button {
+  border: 1px solid white;
+  border-radius: 10px;
+  background-color: black;
+  color: white;
 }
 .profile {
   display: flex;
@@ -280,6 +315,9 @@ export default {
 }
 .hr {
   margin: 5px;
+}
+.editBoard {
+  border-width: 0 0 1px;
 }
 .comment {
   width: 50%;
